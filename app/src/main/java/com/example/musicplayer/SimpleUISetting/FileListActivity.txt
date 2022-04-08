@@ -1,0 +1,234 @@
+package com.example.bitroundradio.SimpleUISetting;
+
+
+import android.app.Activity;
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Environment;
+import android.view.KeyEvent;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import org.liky.music.adapter.FileAdapter;
+import org.liky.music.util.Globals;
+import org.liky.music.util.MusicDAOUtils;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class FileListActivity extends Activity {
+
+    private TextView titleText;
+    private ListView list;
+
+    private FileAdapter adapter;
+    private List<Map<String, Object>> allValues = new ArrayList<Map<String, Object>>();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Globals.init(this);
+
+        setContentView(R.layout.activity_file_list);
+
+        // 取得组件
+        titleText = (TextView) findViewById(R.id.title_text);
+        list = (ListView) findViewById(R.id.list);
+
+        // 准备数据
+        // 取得SD卡根目录
+        File root = Environment.getExternalStorageDirectory();
+
+        loadFileData(root);
+
+        // 建立Adapter
+        adapter = new FileAdapter(this, allValues);
+
+        list.setAdapter(adapter);
+
+        // 加入监听事件
+        list.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+                                    long arg3) {
+                // 取得当前操作的数据
+                Map<String, Object> map = allValues.get(arg2);
+                // 判断所点的是文件还是文件夹
+                boolean dirFlag = (Boolean) map.get("dirFlag");
+                if (dirFlag) {
+                    // 文件夹
+                    // 建立该文件夹的File对象
+                    // 取得绝对路径
+                    String fullPath = (String) map.get("fullPath");
+                    // 建立File
+                    File dir = new File(fullPath);
+
+                    // 先清空原有数据
+                    allValues.clear();
+
+                    if (!Environment.getExternalStorageDirectory()
+                            .getAbsolutePath().equals(fullPath)) {
+                        // 加入返回上一级的操作行
+                        Map<String, Object> parent = new HashMap<String, Object>();
+                        parent.put("fileName", "返回上一级");
+                        parent.put("extName", "dir_open");
+                        parent.put("dirFlag", true);
+                        parent.put("fullPath", dir.getParent());
+
+                        // 保存一个标志
+                        parent.put("flag", "TRUE");
+
+                        // 将这一行加入到数据集合中
+                        allValues.add(parent);
+                    }
+
+                    // 加入新数据
+                    loadFileData(dir);
+
+                    // 使用Adapter通知界面ListView,数据已经被修改了,你也要一起改
+                    adapter.notifyDataSetChanged();
+                } else {
+                    // 点某个文件时,将该文件完整路径传入到MainActivity中
+                    String fullPath = map.get("fullPath").toString();
+                    // 将数据保存到数据库中
+                    MusicDAOUtils.insertData(fullPath);
+
+                    Intent in = new Intent(FileListActivity.this,
+                            MainActivity.class);
+                    in.putExtra("fullPath", fullPath);
+                    startActivity(in);
+                }
+
+            }
+        });
+
+        list.setOnItemLongClickListener(new OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+                                           final int arg2, long arg3) {
+                // 取得数据
+                Map<String, Object> map = allValues.get(arg2);
+                final File f = new File(map.get("fullPath").toString());
+
+                if (f.isFile()) {
+                    // 弹出确认框
+                    Builder builder = new Builder(FileListActivity.this);
+                    builder.setTitle("提示");
+                    builder.setMessage("确定要删除该文件(" + f.getName() + ")吗?");
+                    builder.setPositiveButton("确定", new OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // 将SD卡中的文件删除
+                            if (f.exists()) {
+                                f.delete();
+                            }
+
+                            // 将列表中的数据删除
+                            allValues.remove(arg2);
+                            // 通知
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+                    builder.setNegativeButton("取消", new OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+
+                    builder.create().show();
+                }
+
+                return false;
+            }
+        });
+
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // 根据keyCode判断用户按下了哪个键
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // 判断当前是否在SD卡跟目录.
+            // 取得第一行数据
+            Map<String, Object> map = allValues.get(0);
+            if ("TRUE".equals(map.get("flag"))) {
+                // 里面,需要返回上一级
+                list.performItemClick(list.getChildAt(0), 0, list.getChildAt(0)
+                        .getId());
+            } else {
+                // 弹出提示框
+                Builder builder = new Builder(FileListActivity.this);
+                builder.setTitle("提示");
+                builder.setMessage("亲,真的要离开我吗?");
+                builder.setPositiveButton("真的", new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 关闭当前Activity
+                        finish();
+                    }
+                });
+                builder.setNegativeButton("再待会儿", new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.create().show();
+            }
+
+            return false;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    private void loadFileData(File dir) {
+        // 列出该目录下的所有文件
+        File[] allFiles = dir.listFiles();
+        // 设置当前位置的提示信息
+        titleText.setText("当前位置: " + dir.getAbsolutePath());
+
+        // 判断
+        if (allFiles != null) {
+            // 循环
+            for (int i = 0; i < allFiles.length; i++) {
+                File f = allFiles[i];
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("fileName", f.getName());
+                // 多保存一个文件的绝对路径,方便在进行点击时使用
+                map.put("fullPath", f.getAbsolutePath());
+                // 判断是文件夹还是文件
+                if (f.isDirectory()) {
+                    // 是文件夹
+                    map.put("extName", "dir_close");
+                    map.put("dirFlag", true);
+                } else {
+                    // 是文件
+                    // 截取出扩展名
+                    String extName = f.getName()
+                            .substring(f.getName().lastIndexOf(".") + 1)
+                            .toLowerCase();
+                    map.put("extName", extName);
+                    map.put("dirFlag", false);
+                }
+
+                // 只添加文件夹或所有mp3文件
+                if (f.isDirectory() || "mp3".equals(map.get("extName"))) {
+                    allValues.add(map);
+                }
+            }
+        }
+    }
+
+}

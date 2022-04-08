@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!--添加数据-->
+    <Button
+        android:id="@+id/create_database"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="添加数据">
+
+    </Button>
+
+    <!--添加本地歌曲-->
+    <Button
+
+        android:id="@+id/add_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="添加本地歌曲" >
+
+    </Button>
+
+    <!--刷新本地歌曲-->
+    <Button
+        android:id="@+id/restore_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="刷新本地歌曲">
+
+    </Button>
+
+    <!--更新本地歌曲-->
+    <Button
+        android:id="@+id/updata_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="更新本地歌曲" >
+
+
+    </Button>
+
+
+    <!--排序本地歌曲-->
+    <Button
+        android:id="@+id/query_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="排序本地歌曲" >
+    </Button>
+
+
+    <!--保存本地歌曲-->
+    <Button
+        android:id="@+id/save_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="保存本地歌曲">
+
+
+    </Button>
+
+</LinearLayout>

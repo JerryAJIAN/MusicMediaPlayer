@@ -1,0 +1,24 @@
+<activity
+            android:name=".Activity.MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.File_list"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.List_Item_Activity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.PlayerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.OnlineMusicActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.LocalMuiscActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.Activity_Start"
+            android:exported="false" />

@@ -1,0 +1,345 @@
+package com.example.bitroundradio.SimpleUISetting;
+
+import android.app.Activity;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.liky.music.adapter.MusicAdapter;
+import org.liky.music.util.MusicDAOUtils;
+
+import java.util.List;
+import java.util.Map;
+
+public class MainActivity extends Activity {
+
+    private MediaPlayer player;
+
+    private String filePath = "/storage/sdcard/a.mp3";
+    private String songName = "Fly Me To The Moon";
+    // 准备ListView
+    private ListView list;
+    private MusicAdapter adapter;
+    private List<Map<String, Object>> allValues;
+
+    // 当前播放的歌曲索引
+    private int playingIndex = 0;
+
+    // 音乐名称
+    private TextView musicName;
+    // 播放时间长度的文本
+    private TextView timeText;
+    // 拖动条
+    private SeekBar seekbar;
+    // 播放/暂停 按钮
+    private Button playBtn;
+    // 上一首
+    private Button preBtn;
+    // 下一首
+    private Button nextBtn;
+
+    // 总播放时长的文本
+    private String durationTimeStr;
+
+    // 建立消息通道,以便在子线程中修改界面
+    private Handler handler;
+
+    // 线程对象,监听拖动条的移动
+    private Thread t = null;
+
+    private boolean flag = true;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        player = new MediaPlayer();
+
+        // 接收传入的文件路径
+        filePath = getIntent().getStringExtra("fullPath");
+        // songName = Globals.allSongNameMap.get(filePath);
+
+        // 提取所有歌曲数据,并初始化
+        allValues = MusicDAOUtils.listData();
+
+        // 判断当前应该播放的是列表中的哪一首
+        for (int i = 0; i < allValues.size(); i++) {
+            if (allValues.get(i).get("fullPath").equals(filePath)) {
+                // 该歌曲就是要进行播放的歌曲
+                playingIndex = i;
+                songName = allValues.get(i).get("songName").toString();
+                break;
+            }
+        }
+
+        // 将数据放入到listView中列表
+        list = (ListView) findViewById(R.id.list);
+
+        adapter = new MusicAdapter(allValues, this);
+
+        list.setAdapter(adapter);
+
+        // 设置选中的背景
+        adapter.setSelectedBackground(playingIndex);
+
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                seekbar.setProgress(player.getCurrentPosition());
+                timeText.setText(getTextByMs(player.getCurrentPosition()) + "/"
+                        + durationTimeStr);
+            }
+        };
+
+        // 取得所有组件
+        musicName = (TextView) findViewById(R.id.music_name);
+        timeText = (TextView) findViewById(R.id.time_text);
+
+        seekbar = (SeekBar) findViewById(R.id.seekbar);
+
+        playBtn = (Button) findViewById(R.id.play_btn);
+        preBtn = (Button) findViewById(R.id.pre_btn);
+        nextBtn = (Button) findViewById(R.id.next_btn);
+
+        // 初始化
+
+        // 加入一个多线程,通过子线程控制拖动条以及显示时间的改变
+        t = new Thread() {
+            @Override
+            public void run() {
+                while (flag) {
+                    try {
+                        Thread.sleep(1000);
+
+                        // 取得当前的播放时间位置,设置到拖动条里
+                        if (player.isPlaying()) {
+                            // 传递一个空消息,不需要有具体的消息内容,因为消息通道中只有一个固定的操作,而且不需要参数.
+                            handler.sendEmptyMessage(0);
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        t.start();
+
+        // 播放歌曲
+        playSong();
+
+        // 为播放按钮加监听
+        playBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (player.isPlaying()) {
+                    player.pause();
+                    playBtn.setBackgroundResource(R.drawable.ic_player_play_default);
+                } else {
+                    player.start();
+                    playBtn.setBackgroundResource(R.drawable.ic_player_pause_default);
+                }
+            }
+        });
+
+        // 开始播放
+        playBtn.performClick();
+
+        // 加入拖动条的监听
+        seekbar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // 开始播放, 同时要倒到当前拖动条的位置
+                player.seekTo(seekbar.getProgress());
+                player.start();
+                // 修改按钮的图片
+                playBtn.setBackgroundResource(R.drawable.ic_player_pause_default);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // 暂停播放
+                player.pause();
+                playBtn.setBackgroundResource(R.drawable.ic_player_play_default);
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress,
+                                          boolean fromUser) {
+                // 如果是因为人为拖动造成的值改变,则时间文本需要一起修改,如果是自动改变的拖动条的值,则不需要修改
+                if (fromUser) {
+                    // 修改显示时间的数据
+                    timeText.setText(getTextByMs(progress) + "/"
+                            + durationTimeStr);
+                }
+            }
+        });
+
+        // 设置点某一首歌,进行重新播放的功能
+        list.setOnItemClickListener(new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+                                    long arg3) {
+                // 如果是当前正在播放的歌曲,不需要处理
+                if (arg2 != playingIndex) {
+                    // 播放当前所点击的歌曲
+                    playingIndex = arg2;
+                    // 重新播放歌曲
+                    playSong();
+                    // 播放歌曲
+                    player.start();
+                    playBtn.setBackgroundResource(R.drawable.ic_player_pause_default);
+                    // 重新设置默认选中的歌曲
+                    adapter.setSelectedBackground(playingIndex);
+                }
+
+            }
+        });
+
+        // 设置播放上一首和下一首的功能
+        preBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 判断当前是否在播放第一首
+                if (playingIndex == 0) {
+                    Toast.makeText(MainActivity.this, "当前已经播放的是第一首歌,没有前一首!",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    list.performItemClick((View) adapter
+                                    .getItem(playingIndex - 1), playingIndex - 1,
+                            ((View) (adapter.getItem(playingIndex - 1)))
+                                    .getId());
+                }
+            }
+        });
+        nextBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 判断当前是否在播放最后一首
+                if (playingIndex == allValues.size() - 1) {
+                    Toast.makeText(MainActivity.this, "当前已经播放的是最后一首歌,没有后一首!",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    list.performItemClick((View) adapter
+                                    .getItem(playingIndex + 1), playingIndex + 1,
+                            ((View) (adapter.getItem(playingIndex + 1)))
+                                    .getId());
+                }
+            }
+        });
+
+        // 加入播放完成后,自动播放下一首歌的功能
+        player.setOnCompletionListener(new OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                // 自动播放下一首歌,如果已经是最后一首,直接播放第一首
+                if (playingIndex == allValues.size() - 1) {
+                    list.performItemClick((View) adapter.getItem(0), 0,
+                            ((View) (adapter.getItem(0))).getId());
+                } else {
+                    list.performItemClick((View) adapter
+                                    .getItem(playingIndex + 1), playingIndex + 1,
+                            ((View) (adapter.getItem(playingIndex + 1)))
+                                    .getId());
+                }
+
+            }
+        });
+
+    }
+
+    private void playSong() {
+        filePath = allValues.get(playingIndex).get("fullPath").toString();
+        songName = allValues.get(playingIndex).get("songName").toString();
+
+        // 如果正在播放,则停止播放
+        if (player.isPlaying()) {
+            player.stop();
+        }
+
+        // 重置
+        player.reset();
+
+        try {
+            // 设置要播放的文件
+            player.setDataSource(filePath);
+            // 进行准备操作
+            player.prepare();
+            // player.start();
+
+            // 初始化拖动条的总长度
+            seekbar.setMax(player.getDuration());
+            seekbar.setProgress(0);
+
+            durationTimeStr = getTextByMs(player.getDuration());
+
+            // 修改歌曲标题
+            musicName.setText(songName);
+
+            // 设置显示的播放时间
+            timeText.setText("00:00 / " + durationTimeStr);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "当前加载的音乐有问题,请确定文件格式是否正确!", Toast.LENGTH_LONG)
+                    .show();
+        }
+    }
+
+    // 编写一个算法, 将传入的毫秒数转换成为 分钟:秒钟 的格式
+    private String getTextByMs(int ms) {
+        // 先转换成秒
+        int s = ms / 1000;
+        // 计算分钟
+        int min = s / 60;
+        // 计算剩余的秒数
+        s = s % 60;
+        // 拼接字符串,并补0
+        StringBuilder builder = new StringBuilder();
+        if (min < 10) {
+            builder.append(0);
+        }
+        builder.append(min);
+        builder.append(":");
+        if (s < 10) {
+            builder.append(0);
+        }
+        builder.append(s);
+
+        return builder.toString();
+    }
+
+    @Override
+    protected void onDestroy() {
+        // 退出时释放音乐
+        if (player != null) {
+            if (player.isPlaying()) {
+                player.stop();
+            }
+            player.release();
+        }
+        if (t != null) {
+            try {
+                flag = false;
+                t.interrupt();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        super.onDestroy();
+    }
+}
