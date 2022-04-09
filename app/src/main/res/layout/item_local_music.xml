@@ -24,14 +24,103 @@
 
         >
     <TextView
-        android:id="@+id/item_local_music__num"
+        android:id="@+id/item_local_music_num"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
+        android:text="1"
+        android:layout_centerVertical="true"
+        android:textSize="24sp"
+        android:textStyle="bold"
+
         >
 
 
     </TextView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/item_local_music_song_name"
+            android:text="Honkai Genshin"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_toRightOf="@id/item_local_music_num"
+            android:singleLine="true"
+            android:layout_marginLeft="20dp"
+            >
 
+        </TextView>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/item_local_music_singer"
+        android:text="HOYO-MiX"
+        android:textSize="12sp"
+        android:layout_below="@id/item_local_music_song_name"
+        android:layout_alignLeft="@id/item_local_music_song_name"
+
+
+
+
+        >
+
+
+    </TextView>
+        <TextView
+            android:layout_width="2dp"
+            android:layout_height="18dp"
+            android:id="@+id/item_local_music_line"
+            android:layout_toRightOf="@id/item_local_music_singer"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_alignTop="@id/item_local_music_singer"
+            android:textSize="14sp"
+
+
+
+            >
+
+
+        </TextView>
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="崩坏3-Paradox-Original Soundtrack"
+            android:id="@+id/item_local_music_ablum"
+            android:layout_toRightOf="@id/item_local_music_line"
+            android:layout_alignTop="@id/item_local_music_singer"
+            android:textSize="12sp"
+            android:textColor="#8888"
+            android:ellipsize="end"
+            android:singleLine="true"
+
+
+            >
+
+
+
+        </TextView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/item_local_music_drution"
+            android:layout_below="@id/item_local_music_singer"
+            android:layout_alignParentRight="true"
+            android:text="01:26"
+            android:textSize="11sp"
+            android:layout_marginRight="5dp"
+            android:textColor="#888"
+
+
+
+
+            >
+
+
+
+
+        </TextView>
     </RelativeLayout>
 
 

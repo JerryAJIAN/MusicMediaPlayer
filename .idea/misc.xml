@@ -5,6 +5,12 @@
       <map>
         <entry key="..\:/Porject/AndroidProject/MusicPlayer/app/src/main/res/drawable/background_tabs.xml" value="0.1" />
         <entry key="..\:/Porject/AndroidProject/MusicPlayer/app/src/main/res/drawable/list_item_selector.xml" value="0.1" />
+        <entry key="..\:/Porject/AndroidProject/MusicPlayer/app/src/main/res/drawable/seekbar_equze.xml" value="0.1955" />
+        <entry key="..\:/Porject/AndroidProject/MusicPlayer/app/src/main/res/drawable/seekbar_im.xml" value="0.1955" />
+        <entry key="..\:/Porject/AndroidProject/MusicPlayer/app/src/main/res/drawable/seekbar_time.xml" value="0.1955" />
+        <entry key="..\:/Porject/AndroidProject/MusicPlayer/app/src/main/res/drawable/shang.xml" value="0.1955" />
+        <entry key="..\:/Porject/AndroidProject/MusicPlayer/app/src/main/res/drawable/sleepok.xml" value="0.1955" />
+        <entry key="..\:/Porject/AndroidProject/MusicPlayer/app/src/main/res/drawable/sleepseekr_im.xml" value="0.1955" />
         <entry key="..\:/Porject/AndroidProject/MusicPlayer/app/src/main/res/layout/activity_file_list.xml" value="0.358695652173913" />
         <entry key="..\:/Porject/AndroidProject/MusicPlayer/app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="..\:/Porject/AndroidProject/MusicPlayer/app/src/main/res/layout/activity_music_list_fragment.xml" value="0.358695652173913" />
