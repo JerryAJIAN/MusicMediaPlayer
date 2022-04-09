@@ -28,5 +28,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         singerTv = (TextView) findViewById(R.id.local_music_button_tv_singer);
         songTv = (TextView) findViewById(R.id.local_music_button_tv_song);
         musicRv = (RecyclerView) findViewById(R.id.local_music_rv);
+
+        /*点击事件*/
+        nextIv.setOnClickListener(this);
+        playIv.setOnClickListener(this);
+        prevIv.setOnClickListener(this);
+
+
+
+    }
+
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.local_music_button_iv_previous:
+
+                break;
+            case R.id.local_music_button_iv_play:
+
+                break;
+            case R.id.local_music_button_iv_next:
+
+                break;
+        }
+
+
     }
 }

@@ -104,7 +104,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/item_local_music_drution"
+            android:id="@+id/item_local_music_duration"
             android:layout_below="@id/item_local_music_singer"
             android:layout_alignParentRight="true"
             android:text="01:26"
