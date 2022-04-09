@@ -5,10 +5,149 @@
     tools:context=".MainActivity"
     >
 
-    <ImageView
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/player_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#E3453A"
+        android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_align="center"
+            android:layout_marginLeft="10dp"
+            android:text="LocalMusic"
+            android:textColor="#000000"
+            android:textAlignment="gravity"
+            android:layout_centerVertical="true"
+            android:textSize="16sp">
+
+        </TextView>
+    </androidx.appcompat.widget.Toolbar>
+
+
+
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/local_button_layout"
+        android:background="#33EEEEEE">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#9933FA"
+            >
+        </ImageView>
+        <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@mipmap/icon_song"
+        android:layout_centerVertical="true"
+        android:background="@mipmap/a1"
+        android:layout_marginLeft="10dp"
+        android:id="@+id/local_music_button_iv_icon"
+        >
+
+
+
+         </ImageView>
+        <TextView
+        android:id="@+id/local_music_button_tv_song"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rage Beneath the Mountains 岩壑之崩"
+        android:textSize="14sp"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/local_music_button_iv_icon"
+        android:textStyle="bold"
+        >
+
+
+
+         </TextView>
+
+        <TextView
+            android:id="@+id/local_music_button_tv_songer"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Hoyomix/陈致逸"
+            android:textSize="13sp"
+            android:layout_below="@id/local_music_button_tv_song"
+            android:layout_alignLeft="@id/local_music_button_tv_song"
+            android:layout_marginTop="4dp"
+
+
+            >
+
+
+
+        </TextView>
+
+        <ImageView
+            android:id="@+id/local_music_button_iv_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/icon_next"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="15dp"
+
+            >
+
+
+        </ImageView>
+        <ImageView
+            android:id="@+id/local_music_button_iv_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/icon_play"
+            android:layout_toLeftOf="@id/local_music_button_iv_next"
+            android:layout_marginRight="15dp"
+
+            >
+
+
+        </ImageView>
+        <ImageView
+            android:id="@+id/local_music_button_iv_previous"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/icon_last"
+            android:layout_toLeftOf="@id/local_music_button_iv_play"
+            android:layout_marginRight="15dp"
+
+            >
+
+
+        </ImageView>
+
+
+
+
+    </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/local_music_rv"
+        android:layout_above="@id/local_button_layout"
+        android:layout_below="@id/player_toolbar"
 
-        />
+        >
+
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+
+
 
 </RelativeLayout>
