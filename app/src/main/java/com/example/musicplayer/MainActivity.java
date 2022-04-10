@@ -2,6 +2,7 @@ package com.example.musicplayer;
 
 
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,6 +24,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         initView();
         mDatas = new ArrayList<>();
+
+
+        //创建适配器
+        new LocalMusicAdapter(this,mDatas);
+        musicRv.setAdapter(adapter);
+
+        //设置布局管理器
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
+        musicRv.setLayoutManager(layoutManager);
+
+
+        //加载本地数据源
+        loadLocalMusicData();
+    }
+
+    private void loadLocalMusicData() {
+        /*
+        加载本地储存音乐文件到集合当中
+        **/
+        //获取ContentResolver对象
+        ContentResolver resolver = getContentResolver();
+        //获取本地储存的url地址
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        //开始查询地址
+        resolver.query(uri, null, null, null, null);
+        //遍历Cursor
+
+        int id = 0;
+
+        which(cursor.moveToNext()){
+           String song = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
+           String sinnger = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+           String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
+           id++;
+           String sid = String.valueOf(id);
+           String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+
+        }
+
+
     }
 
     private void initView() {
