@@ -13,11 +13,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TextView  singerTv,songTv;
     RecyclerView musicRv;
 
+    //数据源
+
+    List<LocalMusicBean> mDatas;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
+        mDatas = new ArrayList<>();
     }
 
     private void initView() {
